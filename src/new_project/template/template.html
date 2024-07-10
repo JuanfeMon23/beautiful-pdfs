@@ -1,0 +1,90 @@
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PDF with Dynamic Data</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 20mm;
+        }
+
+        @page {
+            @top-center {
+                content: "This is a header";
+                font-size: 12px;
+                margin-top: -20mm; /* Adjust the margin for the header */
+            }
+
+            @bottom-center {
+                content: "Page " counter(page) " of " counter(pages);
+                font-size: 12px;
+                margin-bottom: -10mm; /* Adjust the margin for the footer */
+            }
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .content {
+            page-break-before: auto;
+            page-break-after: auto;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        p {
+            text-align: justify;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid black;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>PDF with Dynamic Data</h1>
+    </header>
+    <main class="content">
+        <h2>Hello, {{ name }}!</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in data %}
+                <tr>
+                    <td>{{ item.id }}</td>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.value }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </main>
+    <footer>
+        <p>Page {{ page_number }}</p>
+    </footer>
+</body>
+</html>

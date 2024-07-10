@@ -1,0 +1,15 @@
+h1 {
+    background-color: aquamarine;
+}
+
+.container {
+    background-color: bisque;
+    border-radius: 13px;
+    padding: 20px;
+    align-items: center;
+}
+
+.table_title{
+    background-color:chartreuse;
+    border-radius: 13px;
+}
