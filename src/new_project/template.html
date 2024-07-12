@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>PDF with Dynamic Data</title>
+            <link rel="stylesheet" href="styles.css">
+        </head>
+        <body>
+            {{header}}
+            <div class="content">
+                <h1>Test de esfuerzo</h1>
+                <table>
+                    <thead>
+                        <tr>
+                            <td>Etapa</td>
+                            <td>Tiempo[s]</td>
+                            <td>Rf[bpm]</td>
+                            <td>PSE Borg</td>
+                            <td>VO2</td>
+                            <td>Target[W]</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for index, item in enumerate(data) %}
+                        <tr>
+                            <td>{{ index + 1 }}</td>
+                            <td>{{ item.time }}</td>
+                            <td>{{ item.heart_rate }}</td>
+                            <td>{{ item.PseBorg }}</td>
+                            <td>{{ item.oxygen }}</td>
+                            <td>{{ item.target }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {{footer}}
+        </body>
+        </html>

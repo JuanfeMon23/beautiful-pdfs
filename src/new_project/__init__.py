@@ -22,15 +22,21 @@ app.add_middleware(
 )
 
 
-class DataRequest(BaseModel):
+class EffortTestData(BaseModel):
     time: Union[float, int]
     heart_rate: Union[float, int]
-    PseBorg: Optional[Union[float, int]] = Field(default=None)
+    PseBorg: Optional[Union[float, int]] = Field(default='')
     oxygen: Union[float, int]
     target: Union[float, int]
 
+class DataRequest(BaseModel):
+    data: List[EffortTestData]
+    items: List[str]
+
 @app.post("/generate-pdf", response_class=Response)
-async def generate_pdf(data: List[DataRequest]):
+async def generate_pdf(data: DataRequest):
+    print(data)
+    print(Response)
     try:
         html_content = f"""
         <!DOCTYPE html>
@@ -97,20 +103,21 @@ async def generate_pdf(data: List[DataRequest]):
                         </tr>
                     </thead>
                     <tbody>
-                        {"".join(f"<tr><td>{index + 1}</td><td>{item.time}</td><td>{item.heart_rate}</td><td>{item.PseBorg}</td><td>{item.oxygen}</td><td>{item.target}</td></tr>" for index, item in enumerate(data))}
+                        {"".join(f"<tr><td>{index + 1}</td><td>{item.time}</td><td>{item.heart_rate}</td><td>{item.PseBorg}</td><td>{item.oxygen}</td><td>{item.target}</td></tr>" for index, item in enumerate(data.data))}
                     </tbody>
                 </table>
+                    <h2>Observaciones</h2>
+                        {"".join(f"<li>{item}</li>" for index, item in enumerate(data.items))}
             </main>
         </body>
         </html>
         """
         pdf = HTML(string=html_content).write_pdf()
 
-        return Response(content=pdf, media_type="applic ation/pdf", headers={
+        return Response(content=pdf, media_type="application/pdf", headers={
             "Content-Disposition": "inline; filename=dynamic_data.pdf"
         })
     except Exception as e:
-
         raise HTTPException(status_code=500, detail=str(e))
 if __name__ == "__main__":
     import uvicorn
