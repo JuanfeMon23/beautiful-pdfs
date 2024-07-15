@@ -22,6 +22,20 @@ app.add_middleware(
 )
 
 
+class PretestData(BaseModel):
+    isPositive : str
+    yearsOfBirthday: str
+    restFc: str
+    maximumFc: str
+    cardiovascularSynthm: str
+    bloodPresure: str
+    cardiovascularAuscultation: str
+    pulmonarAuscultation: str
+    initialRysk: str
+    initialOmRisk: str
+    generalMovility: str
+    observations: str
+
 class EffortTestData(BaseModel):
     time: Union[float, int]
     heart_rate: Union[float, int]
@@ -32,11 +46,12 @@ class EffortTestData(BaseModel):
 class DataRequest(BaseModel):
     data: List[EffortTestData]
     items: List[str]
+    pretestData : PretestData
+    pretestRecomendations : List[str]
 
 @app.post("/generate-pdf", response_class=Response)
 async def generate_pdf(data: DataRequest):
     print(data)
-    print(Response)
     try:
         html_content = f"""
         <!DOCTYPE html>
@@ -84,12 +99,84 @@ async def generate_pdf(data: DataRequest):
                     padding: 10px;
                     text-align: left;
                 }}
+
+                .table_title {{
+                    font-weight: bold;
+                    text-decoration: underline;
+                }}
+
+                .observation_place {{
+                  text-align: justify;
+                    text-justify: inter-word;
+                    width: 80%;
+                }}
             </style>
         </head>
         <body>
-            <header>
-                <h1>Test de esfuerzo</h1>
-            </header>
+            <p class="table_title">Tabla    resultados obtenidos en el pretest fisico</p>
+            <table>
+                <thead>
+                    <tr>
+                        <td>Variable</td>
+                        <td>Resultado</td>
+                    </tr>
+                </thead>
+<tbody>
+                    <tr>
+                        <td>Cumple requisitos</td>
+                        <td>{data.pretestData.isPositive}</td>
+                    </tr>
+                    <tr>
+                        <td>Edad (años)</td>
+                        <td>{data.pretestData.yearsOfBirthday}</td>
+                    </tr>
+                    <tr>
+                        <td>FC en reposo (l.p.m)</td>
+                        <td>{data.pretestData.restFc}</td>
+                    </tr>
+                    <tr>
+                        <td>FC máxima teórica [207 - (edad * 0.7)]</td>
+                        <td>{data.pretestData.maximumFc}</td>
+                    </tr>
+                    <tr>
+                        <td>Síntomas cardiovasculares actuales</td>
+                        <td>{data.pretestData.cardiovascularSynthm}</td>
+                    </tr>
+                    <tr>
+                        <td>Presión arterial inicial (mmHg)</td>
+                        <td>{data.pretestData.bloodPresure}</td>
+                    </tr>
+                    <tr>
+                        <td>Auscultación cardiovascular</td>
+                        <td>{data.pretestData.cardiovascularAuscultation}</td>
+                    </tr>
+                    <tr>
+                        <td>Auscultación pulmonar</td>
+                        <td>{data.pretestData.pulmonarAuscultation}</td>
+                    </tr>
+                    <tr>
+                        <td>Movilidad general</td>
+                        <td>{data.pretestData.generalMovility}</td>
+                    </tr>
+                    <tr>
+                        <td>Observaciones</td>
+                        <td>{data.pretestData.observations}</td>
+                    </tr>
+                    <tr>
+                        <td>RCV</td>
+                        <td>{data.pretestData.initialRysk}</td>
+                    </tr>
+                    <tr>
+                        <td>Riesgo OM inicial</td>
+                        <td>{data.pretestData.initialOmRisk}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="observation_place">
+                <h4>Recomendaciones</h4>
+                        {"".join(f"<li>{item}</li>" for index, item in enumerate(data.pretestRecomendations))}
+            </div>
+            <p class="table_title">Tabla resultados test consumo maximo de oxigeno en bicicleta</p>
             <main class="content">
                 <table>
                     <thead>
@@ -106,8 +193,10 @@ async def generate_pdf(data: DataRequest):
                         {"".join(f"<tr><td>{index + 1}</td><td>{item.time}</td><td>{item.heart_rate}</td><td>{item.PseBorg}</td><td>{item.oxygen}</td><td>{item.target}</td></tr>" for index, item in enumerate(data.data))}
                     </tbody>
                 </table>
-                    <h2>Observaciones</h2>
-                        {"".join(f"<li>{item}</li>" for index, item in enumerate(data.items))}
+                <div class="observation_place">
+                    <h4>Observaciones</h4>
+                            {"".join(f"<li>{item}</li>" for index, item in enumerate(data.items))}
+                </div>
             </main>
         </body>
         </html>
